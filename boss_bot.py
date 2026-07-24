@@ -21,13 +21,23 @@ TIMEZONE = pytz.timezone("Europe/Berlin")  # Cambia a tu zona
 # Formato: "Nombre del Jefe": ["HH:MM", "HH:MM", ...]
 # Puedes poner múltiples horarios por jefe
 
-BOSS_SCHEDULE = {
+EVENT_SCHEDULE = {
+    # ═══════ JEFES ═══════
     "Jefe del Bosque Oscuro": ["12:00", "18:00", "00:00"],
     "Dragón de Fuego": ["14:00", "20:00", "02:00"],
     "Golem de Piedra": ["10:00", "16:00", "22:00"],
     "Espectro del Abismo": ["08:00", "15:00", "21:00"],
     "Rey Orco": ["11:00", "17:00", "23:00"],
-    # Agrega más jefes según los horarios de Orion2
+    
+    # ═══════ METINES ═══════
+    "Metin de Fuego": ["09:00", "15:00", "21:00"],
+    "Metin de Hielo": ["10:00", "16:00", "22:00"],
+    "Metin del Trueno": ["11:00", "17:00", "23:00"],
+    
+    # ═══════ EVENTOS ESPECIALES ═══════
+    "Guerra del Reino": ["20:00"],
+    "Torneo PvP": ["19:00"],
+    "Doble Experiencia": ["16:00"],
 }
 
 # Minutos antes del spawn para enviar el aviso
@@ -50,7 +60,7 @@ def get_next_spawn_times():
     now = datetime.now(TIMEZONE)
     upcoming = []
 
-    for boss_name, times in BOSS_SCHEDULE.items():
+    for boss_name, times in EVENT_SCHEDULE.items():
         for time_str in times:
             # Parsear la hora
             hour, minute = map(int, time_str.split(":"))
@@ -198,11 +208,11 @@ async def add_boss_command(interaction: discord.Interaction, nombre: str, hora: 
         # Validar formato de hora
         datetime.strptime(hora, "%H:%M")
 
-        if nombre not in BOSS_SCHEDULE:
-            BOSS_SCHEDULE[nombre] = []
+        if nombre not in EVENT_SCHEDULE:
+            EVENT_SCHEDULE[nombre] = []
 
-        if hora not in BOSS_SCHEDULE[nombre]:
-            BOSS_SCHEDULE[nombre].append(hora)
+        if hora not in EVENT_SCHEDULE[nombre]:
+            EVENT_SCHEDULE[nombre].append(hora)
             await interaction.response.send_message(
                 f"✅ Jefe **{nombre}** agregado a las `{hora}`",
                 ephemeral=True
@@ -222,8 +232,8 @@ async def add_boss_command(interaction: discord.Interaction, nombre: str, hora: 
 @bot.tree.command(name="eliminar_jefe", description="Elimina un jefe del horario")
 @discord.app_commands.describe(nombre="Nombre del jefe a eliminar")
 async def remove_boss_command(interaction: discord.Interaction, nombre: str):
-    if nombre in BOSS_SCHEDULE:
-        del BOSS_SCHEDULE[nombre]
+    if nombre in EVENT_SCHEDULE:
+        del EVENT_SCHEDULE[nombre]
         await interaction.response.send_message(
             f"🗑️ Jefe **{nombre}** eliminado del horario",
             ephemeral=True
@@ -242,7 +252,7 @@ async def schedule_command(interaction: discord.Interaction):
         color=0xAAFF44
     )
 
-    for boss, times in BOSS_SCHEDULE.items():
+    for boss, times in EVENT_SCHEDULE.items():
         times_str = ", ".join([f"`{t}`" for t in sorted(times)])
         embed.add_field(name=f"⚔️ {boss}", value=times_str, inline=False)
 
