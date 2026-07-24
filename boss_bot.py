@@ -9,7 +9,7 @@ import asyncio
 # ═══════════════════════════════════════════════════════════
 
 import os
-TOKEN = os.environ.get("MTUzMDI0Nzc3NjA0MTE3MzAxMg.GAuw2j.GBzL-e41GOA9m24dF6KypfQKxhOGIHSyN9Kv3c")
+TOKEN = os.environ.get("TOKEN")
 CHANNEL_ID = 1530256665616842792   # ← ID del canal donde enviará los avisos
 
 # Zona horaria del juego (ajústala según el servidor de Orion2)
