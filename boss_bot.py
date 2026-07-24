@@ -27,7 +27,7 @@ EVENT_SCHEDULE = {
 
     # ======= METINES SAGRADOS =======
     "Metin de Gruta 1": ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"],
-    "Metin de Maps 90": ["10:00", "16:00", "22:00"],
+    "Metin de Hielo": ["10:00", "16:00", "22:00"],
     "Metin del Trueno": ["11:00", "17:00", "23:00"],
 
     # ======= GRANDES GUERRAS =======
@@ -200,23 +200,19 @@ def cleanup_old_warnings():
 
 @tasks.loop(minutes=1)
 async def daily_cleanup():
-    """Revisa cada minuto si son las 00:00 y borra mensajes del bot."""
     now = datetime.now(TIMEZONE)
 
-    # Si son las 00:00 (medianoche)
     if now.hour == 0 and now.minute == 0:
         channel = bot.get_channel(CHANNEL_ID)
         if channel is None:
             return
 
-        # Calcula la fecha de ayer
         ayer = now - timedelta(days=1)
         fecha_ayer_str = ayer.strftime('%Y-%m-%d')
 
         def es_mensaje_del_bot_de_ayer(m):
             if m.author.id != bot.user.id:
                 return False
-            # Verifica si el mensaje es de ayer
             msg_fecha = m.created_at.astimezone(TIMEZONE).strftime('%Y-%m-%d')
             return msg_fecha == fecha_ayer_str
 
@@ -224,7 +220,6 @@ async def daily_cleanup():
             eliminados = await channel.purge(limit=500, check=es_mensaje_del_bot_de_ayer)
             print(f"🗑️ Limpieza diaria: {len(eliminados)} mensajes del {fecha_ayer_str} eliminados")
 
-            # Mensaje de confirmación (se borrará mañana)
             embed = discord.Embed(
                 title="🧹 LIMPIEZA DIARIA COMPLETADA",
                 description=f"Se han purgado **{len(eliminados)}** mensajes del día anterior.\n\n*El canal está listo para nuevas batallas.*",
@@ -236,9 +231,12 @@ async def daily_cleanup():
         except Exception as e:
             print(f"Error en limpieza diaria: {e}")
 
-        # Espera 2 minutos para no repetir en el mismo minuto
         await asyncio.sleep(120)
 
+
+# =========================================================
+# COMANDOS SLASH
+# =========================================================
 
 @bot.tree.command(name="bosses", description="Próximas batallas de la Dinastía")
 async def bosses_command(interaction: discord.Interaction):
@@ -325,7 +323,6 @@ async def schedule_command(interaction: discord.Interaction):
 @discord.app_commands.default_permissions(administrator=True)
 @discord.app_commands.describe(cantidad="Cantidad de mensajes a revisar (máx 100)")
 async def limpiar_command(interaction: discord.Interaction, cantidad: int = 100):
-    """Borra los mensajes enviados por el bot en el canal actual."""
     await interaction.response.defer(ephemeral=True)
 
     if cantidad > 100:
