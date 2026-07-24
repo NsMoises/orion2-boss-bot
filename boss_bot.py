@@ -8,7 +8,8 @@ import asyncio
 # CONFIGURACIÓN - EDITAR ESTOS VALORES
 # ═══════════════════════════════════════════════════════════
 
-TOKEN = "MTUzMDI0Nzc3NjA0MTE3MzAxMg.GgQvwJ.SX1ThRmqXFTVv-yrzJHS57qgIQD8Ny36sAC02o"  # ← Pega tu token del bot aquí
+import os
+TOKEN = os.environ.get("MTUzMDI0Nzc3NjA0MTE3MzAxMg.GgQvwJ.SX1ThRmqXFTVv-yrzJHS57qgIQD8Ny36sAC02o")
 CHANNEL_ID = 1530256665616842792   # ← ID del canal donde enviará los avisos
 
 # Zona horaria del juego (ajústala según el servidor de Orion2)
