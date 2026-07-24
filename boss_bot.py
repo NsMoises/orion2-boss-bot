@@ -27,7 +27,7 @@ EVENT_SCHEDULE = {
 
     # ======= METINES SAGRADOS =======
     "Metin de Gruta 1": ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"],
-    "Metin de Hielo": ["10:00", "16:00", "22:00"],
+    "Metin de Maps 90": ["10:00", "16:00", "22:00"],
     "Metin del Trueno": ["11:00", "17:00", "23:00"],
 
     # ======= GRANDES GUERRAS =======
@@ -43,22 +43,17 @@ WARNING_MINUTES = [10, 5, 1]
 # =========================================================
 
 EVENT_CONFIG = {
-    # Soldados de la Dinastía
     "General Yonghan Gruta 2": {"rank": "🏯 MARISCAL", "color": 0xC41E3A, "banner": "🐉"},
-    "Dragón de Fuego":         {"rank": "🔥 DRAGÓN", "color": 0xFF4500, "banner": "🐲"},
+    "Golem Magico Gruta 1":    {"rank": "🧙 MAGO", "color": 0x9932CC, "banner": "🔮"},
     "Golem de Piedra":         {"rank": "🗿 GUARDIÁN", "color": 0x8B7355, "banner": "⛰️"},
     "Espectro del Abismo":     {"rank": "👻 ESPECTRO", "color": 0x4A0080, "banner": "🌑"},
     "Rey Orco":                {"rank": "👹 SEÑOR", "color": 0x228B22, "banner": "🪓"},
-
-    # Metines Sagrados
-    "Metin de Fuego":          {"rank": "🔥 METIN", "color": 0xFF6347, "banner": "☄️"},
+    "Metin de Gruta 1":        {"rank": "💎 METIN", "color": 0xFF6347, "banner": "☄️"},
     "Metin de Hielo":          {"rank": "❄️ METIN", "color": 0x00BFFF, "banner": "🧊"},
     "Metin del Trueno":        {"rank": "⚡ METIN", "color": 0xFFD700, "banner": "🌩️"},
-
-    # Grandes Guerras
-    "Guerra del Reino":        {"rank": "⚔️ GUERRA", "color": 0x8B0000, "banner": "🏰"},
-    "Torneo PvP":              {"rank": "🏆 TORNEO", "color": 0xDAA520, "banner": "🎯"},
-    "Doble Experiencia":       {"rank": "✨ EVENTO", "color": 0x9370DB, "banner": "🌟"},
+    "Bruja de Hielo Gruta 1":  {"rank": "🧙 BRUJA", "color": 0x00CED1, "banner": "❄️"},
+    "Rey Wubba Map 90":        {"rank": "👑 REY", "color": 0xFFD700, "banner": "👑"},
+    "Azrael Infernal":         {"rank": "😈 AZRAEL", "color": 0x8B0000, "banner": "🔥"},
 }
 
 WARNING_STYLES = {
@@ -125,6 +120,7 @@ def get_next_spawn_times():
 async def on_ready():
     print(f"🏯 Bot de la Dinastía conectado: {bot.user}")
     check_events.start()
+    daily_cleanup.start()
 
 
 @tasks.loop(seconds=30)
@@ -196,6 +192,52 @@ def cleanup_old_warnings():
         except:
             pass
     sent_warnings.difference_update(to_remove)
+
+
+# =========================================================
+# LIMPIEZA AUTOMÁTICA DIARIA A LAS 00:00
+# =========================================================
+
+@tasks.loop(minutes=1)
+async def daily_cleanup():
+    """Revisa cada minuto si son las 00:00 y borra mensajes del bot."""
+    now = datetime.now(TIMEZONE)
+
+    # Si son las 00:00 (medianoche)
+    if now.hour == 0 and now.minute == 0:
+        channel = bot.get_channel(CHANNEL_ID)
+        if channel is None:
+            return
+
+        # Calcula la fecha de ayer
+        ayer = now - timedelta(days=1)
+        fecha_ayer_str = ayer.strftime('%Y-%m-%d')
+
+        def es_mensaje_del_bot_de_ayer(m):
+            if m.author.id != bot.user.id:
+                return False
+            # Verifica si el mensaje es de ayer
+            msg_fecha = m.created_at.astimezone(TIMEZONE).strftime('%Y-%m-%d')
+            return msg_fecha == fecha_ayer_str
+
+        try:
+            eliminados = await channel.purge(limit=500, check=es_mensaje_del_bot_de_ayer)
+            print(f"🗑️ Limpieza diaria: {len(eliminados)} mensajes del {fecha_ayer_str} eliminados")
+
+            # Mensaje de confirmación (se borrará mañana)
+            embed = discord.Embed(
+                title="🧹 LIMPIEZA DIARIA COMPLETADA",
+                description=f"Se han purgado **{len(eliminados)}** mensajes del día anterior.\n\n*El canal está listo para nuevas batallas.*",
+                color=0x2ECC71
+            )
+            embed.set_footer(text="🏯 DinastíaL7 • Limpieza automática")
+            await channel.send(embed=embed)
+
+        except Exception as e:
+            print(f"Error en limpieza diaria: {e}")
+
+        # Espera 2 minutos para no repetir en el mismo minuto
+        await asyncio.sleep(120)
 
 
 @bot.tree.command(name="bosses", description="Próximas batallas de la Dinastía")
@@ -277,6 +319,27 @@ async def schedule_command(interaction: discord.Interaction):
         )
 
     await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(name="limpiar", description="Borra los mensajes del bot en este canal (solo admins)")
+@discord.app_commands.default_permissions(administrator=True)
+@discord.app_commands.describe(cantidad="Cantidad de mensajes a revisar (máx 100)")
+async def limpiar_command(interaction: discord.Interaction, cantidad: int = 100):
+    """Borra los mensajes enviados por el bot en el canal actual."""
+    await interaction.response.defer(ephemeral=True)
+
+    if cantidad > 100:
+        cantidad = 100
+
+    def es_mensaje_del_bot(m):
+        return m.author.id == bot.user.id
+
+    eliminados = await interaction.channel.purge(limit=cantidad, check=es_mensaje_del_bot)
+
+    await interaction.followup.send(
+        f"🗑️ **{len(eliminados)}** mensajes del bot han sido ejecutados.",
+        ephemeral=True
+    )
 
 
 @bot.event
