@@ -24,7 +24,7 @@ TIMEZONE = pytz.timezone("Europe/Berlin")  # Cambia a tu zona
 EVENT_SCHEDULE = {
     # ═══════ JEFES ═══════
     "General Yonghan Gruta 2": ["22:30", "00:00", "01:30","03:00", "04:30", "06:00","07:30", "09:00", "10:30","12:00", "13:30", "15:00","16:30", "18:00", "19:30","21:00"],
-    "Dragón de Fuego": ["14:00", "20:00", "02:00"],
+    "Magic Golem Gruta 1": ["22:30", "00:00", "01:30","03:00", "04:30", "06:00","07:30", "09:00", "10:30","12:00", "13:30", "15:00","16:30", "18:00", "19:30","21:00"],
     "Golem de Piedra": ["10:00", "16:00", "22:00"],
     "Espectro del Abismo": ["08:00", "15:00", "21:00"],
     "Rey Orco": ["11:00", "17:00", "23:00"],
@@ -41,7 +41,7 @@ EVENT_SCHEDULE = {
 }
 
 # Minutos antes del spawn para enviar el aviso
-WARNING_MINUTES = 5
+WARNING_MINUTES = [10, 5, 1]  # Avisos a 10, 5 y 1 minuto antes
 
 # ═══════════════════════════════════════════════════════════
 # CÓDIGO DEL BOT (NO EDITAR A PARTIR DE AQUÍ)
@@ -56,27 +56,27 @@ sent_warnings = set()
 
 
 def get_next_spawn_times():
-    """Calcula los próximos spawns de cada jefe."""
+    """Calcula los próximos spawns de cada evento."""
     now = datetime.now(TIMEZONE)
     upcoming = []
 
-    for boss_name, times in EVENT_SCHEDULE.items():
+    for event_name, times in EVENT_SCHEDULE.items():
         for time_str in times:
-            # Parsear la hora
             hour, minute = map(int, time_str.split(":"))
             spawn_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-
-            # Si ya pasó hoy, es mañana
             if spawn_time < now:
                 spawn_time += timedelta(days=1)
 
-            upcoming.append({
-                "boss": boss_name,
-                "spawn_time": spawn_time,
-                "warning_time": spawn_time - timedelta(minutes=WARNING_MINUTES)
-            })
+            # Crear un aviso por cada tiempo de warning
+            for warning_min in WARNING_MINUTES:
+                warning_time = spawn_time - timedelta(minutes=warning_min)
+                upcoming.append({
+                    "event": event_name,
+                    "spawn_time": spawn_time,
+                    "warning_time": warning_time,
+                    "warning_min": warning_min
+                })
 
-    # Ordenar por tiempo de aviso
     upcoming.sort(key=lambda x: x["warning_time"])
     return upcoming
 
@@ -93,12 +93,11 @@ async def on_ready():
 
 @tasks.loop(seconds=30)
 async def check_bosses():
-    """Revisa cada 30 segundos si hay un jefe próximo a aparecer."""
+    """Revisa cada 30 segundos si hay un evento próximo a aparecer."""
     now = datetime.now(TIMEZONE)
     channel = bot.get_channel(CHANNEL_ID)
 
     if channel is None:
-        print(f"⚠️ No se encontró el canal con ID {CHANNEL_ID}")
         return
 
     upcoming_spawns = get_next_spawn_times()
@@ -106,40 +105,53 @@ async def check_bosses():
     for spawn in upcoming_spawns:
         warning_time = spawn["warning_time"]
         spawn_time = spawn["spawn_time"]
-        boss_name = spawn["boss"]
+        event_name = spawn["event"]
+        warning_min = spawn["warning_min"]
 
-        # Crear ID único para este aviso (evita duplicados)
-        warning_id = f"{boss_name}_{spawn_time.strftime('%Y-%m-%d_%H:%M')}"
+        # Crear ID único para este aviso específico (incluye los minutos de aviso)
+        warning_id = f"{event_name}_{spawn_time.strftime('%Y-%m-%d_%H:%M')}_{warning_min}min"
 
-        # Si ya pasó el tiempo de aviso y no hemos enviado aviso
         if now >= warning_time and now < spawn_time and warning_id not in sent_warnings:
             minutes_until = int((spawn_time - now).total_seconds() / 60)
 
-            # Crear embed bonito
+            # Color según tipo de evento
+            if "Jefe" in event_name or "General" in event_name:
+                color = 0xFF0000  # Rojo para jefes
+                emoji = "⚔️"
+            elif "Metin" in event_name:
+                color = 0xFFA500  # Naranja para metines
+                emoji = "💎"
+            else:
+                color = 0x00FF00  # Verde para eventos
+                emoji = "🎉"
+
+            # Emoji según tiempo de aviso
+            if warning_min == 15:
+                time_emoji = "⏳"
+            elif warning_min == 5:
+                time_emoji = "🔔"
+            else:
+                time_emoji = "🚨"
+
             embed = discord.Embed(
-                title="⚔️ ¡ALERTA DE JEFE!",
-                description=f"**{boss_name}** aparecerá en **{minutes_until} minutos**",
-                color=0xFF4444
+                title=f"{time_emoji} ¡ALERTA DE EVENTO! {time_emoji}",
+                description=f"{emoji} **{event_name}** aparecerá en **{minutes_until} minutos**",
+                color=color
             )
             embed.add_field(
-                name="🕐 Hora exacta del spawn",
+                name="🕐 Hora exacta",
                 value=f"`{spawn_time.strftime('%H:%M')}`",
                 inline=True
             )
             embed.add_field(
-                name="📍 Mapa",
-                value="Consulta el mapa del juego",
+                name="⏰ Aviso",
+                value=f"`{warning_min} min antes`",
                 inline=True
             )
             embed.set_footer(text="Orion2 Boss Bot • ¡Prepara tu equipo!")
 
-            await channel.send(embed=embed)
-            print(f"📢 Aviso enviado: {boss_name} a las {spawn_time.strftime('%H:%M')}")
-
-            # Marcar como enviado
+            await channel.send("@everyone", embed=embed)
             sent_warnings.add(warning_id)
-
-            # Limpiar avisos viejos (de hace más de 1 día)
             cleanup_old_warnings()
 
     # Limpiar sent_warnings de avisos que ya pasaron hace tiempo
