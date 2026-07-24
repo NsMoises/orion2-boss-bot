@@ -6,7 +6,7 @@ import asyncio
 import os
 
 # =========================================================
-# CONFIGURACION
+# CONFIGURACIÓN
 # =========================================================
 
 TOKEN = os.environ.get("TOKEN")
@@ -18,57 +18,72 @@ TIMEZONE = pytz.timezone("Europe/Berlin")
 # =========================================================
 
 EVENT_SCHEDULE = {
-    # ======= JEFES =======
+    # ======= SOLDADOS DE LA DINASTÍA =======
     "General Yonghan Gruta 2": ["22:30", "00:00", "01:30", "03:00", "04:30", "06:00", "07:30", "09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00", "22:30"],
     "Golem Magico Gruta 1": ["22:30", "00:00", "01:30", "03:00", "04:30", "06:00", "07:30", "09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00", "22:30"],
     "Golem de Piedra": ["10:00", "16:00", "22:00"],
     "Espectro del Abismo": ["08:00", "15:00", "21:00"],
     "Rey Orco": ["11:00", "17:00", "23:00"],
 
-    # ======= METINES =======
+    # ======= METINES SAGRADOS =======
     "Metin de Gruta 1": ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"],
     "Metin de Hielo": ["10:00", "16:00", "22:00"],
     "Metin del Trueno": ["11:00", "17:00", "23:00"],
 
-    # ======= EVENTOS ESPECIALES =======
-    "Guerra del Reino": ["20:00"],
-    "Torneo PvP": ["19:00"],
-    "Doble Experiencia": ["16:00"],
+    # ======= GRANDES GUERRAS =======
+    "Bruja de Hielo Gruta 1": ["11:10", "17:10", "20:10", "23:10"],
+    "Rey Wubba Map 90": ["11:40", "17:40", "20:40", "22:40"],
+    "Azrael Infernal": ["09:00", "19:00", "22:00"],
 }
 
-WARNING_MINUTES = [15, 5, 1]
+WARNING_MINUTES = [10, 5, 1]
 
 # =========================================================
-# CONFIGURACION VISUAL
+# CONFIGURACIÓN VISUAL — DINASTÍA CHINA
 # =========================================================
 
 EVENT_CONFIG = {
-    # Jefes
-    "General Yonghan Gruta 2": {"emoji": "👑", "color": 0xFFD700, "image": "https://i.imgur.com/boss_crown.png"},
-    "Dragon de Fuego": {"emoji": "🐉", "color": 0xFF4500, "image": None},
-    "Golem de Piedra": {"emoji": "🗿", "color": 0x8B4513, "image": None},
-    "Espectro del Abismo": {"emoji": "👻", "color": 0x4B0082, "image": None},
-    "Rey Orco": {"emoji": "👹", "color": 0x228B22, "image": None},
+    # Soldados de la Dinastía
+    "General Yonghan Gruta 2": {"rank": "🏯 MARISCAL", "color": 0xC41E3A, "banner": "🐉"},
+    "Dragón de Fuego":         {"rank": "🔥 DRAGÓN", "color": 0xFF4500, "banner": "🐲"},
+    "Golem de Piedra":         {"rank": "🗿 GUARDIÁN", "color": 0x8B7355, "banner": "⛰️"},
+    "Espectro del Abismo":     {"rank": "👻 ESPECTRO", "color": 0x4A0080, "banner": "🌑"},
+    "Rey Orco":                {"rank": "👹 SEÑOR", "color": 0x228B22, "banner": "🪓"},
 
-    # Metines
-    "Metin de Fuego": {"emoji": "🔥", "color": 0xFF6347, "image": None},
-    "Metin de Hielo": {"emoji": "❄️", "color": 0x00BFFF, "image": None},
-    "Metin del Trueno": {"emoji": "⚡", "color": 0xFFD700, "image": None},
+    # Metines Sagrados
+    "Metin de Fuego":          {"rank": "🔥 METIN", "color": 0xFF6347, "banner": "☄️"},
+    "Metin de Hielo":          {"rank": "❄️ METIN", "color": 0x00BFFF, "banner": "🧊"},
+    "Metin del Trueno":        {"rank": "⚡ METIN", "color": 0xFFD700, "banner": "🌩️"},
 
-    # Eventos
-    "Guerra del Reino": {"emoji": "⚔️", "color": 0xDC143C, "image": None},
-    "Torneo PvP": {"emoji": "🏆", "color": 0xFFA500, "image": None},
-    "Doble Experiencia": {"emoji": "✨", "color": 0x9370DB, "image": None},
+    # Grandes Guerras
+    "Guerra del Reino":        {"rank": "⚔️ GUERRA", "color": 0x8B0000, "banner": "🏰"},
+    "Torneo PvP":              {"rank": "🏆 TORNEO", "color": 0xDAA520, "banner": "🎯"},
+    "Doble Experiencia":       {"rank": "✨ EVENTO", "color": 0x9370DB, "banner": "🌟"},
 }
 
-WARNING_CONFIG = {
-    15: {"emoji": "⏳", "title": "📢 PRE-ALERTA", "mention": False},
-    5: {"emoji": "🔔", "title": "🚨 ALERTA", "mention": True},
-    1: {"emoji": "🚨", "title": "🔥 ULTIMO MINUTO", "mention": True},
+WARNING_STYLES = {
+    10: {
+        "seal": "◈◈◈",
+        "call": "Los exploradores avistan movimiento en el horizonte...",
+        "mood": "🟢",
+        "mention": False,
+    },
+    5: {
+        "seal": "◈◈◈ ◈◈◈",
+        "call": "¡Los tambores de guerra retumban! ¡A las armas!",
+        "mood": "🟡",
+        "mention": True,
+    },
+    1: {
+        "seal": "◈◈◈ ◈◈◈ ◈◈◈",
+        "call": "¡EL ENEMIGO ESTÁ A LAS PUERTAS! ¡FORMACIÓN!",
+        "mood": "🔴",
+        "mention": True,
+    },
 }
 
 # =========================================================
-# CODIGO DEL BOT
+# CÓDIGO DEL BOT
 # =========================================================
 
 intents = discord.Intents.default()
@@ -79,7 +94,7 @@ sent_warnings = set()
 
 
 def get_event_config(event_name):
-    return EVENT_CONFIG.get(event_name, {"emoji": "📌", "color": 0x7289DA, "image": None})
+    return EVENT_CONFIG.get(event_name, {"rank": "📌 SOLDADO", "color": 0x7289DA, "banner": "📍"})
 
 
 def get_next_spawn_times():
@@ -108,8 +123,7 @@ def get_next_spawn_times():
 
 @bot.event
 async def on_ready():
-    print(f"✅ Bot conectado como: {bot.user}")
-    print(f"📡 Canal objetivo: {CHANNEL_ID}")
+    print(f"🏯 Bot de la Dinastía conectado: {bot.user}")
     check_events.start()
 
 
@@ -134,50 +148,36 @@ async def check_events():
         if now >= warning_time and now < spawn_time and warning_id not in sent_warnings:
             minutes_until = int((spawn_time - now).total_seconds() / 60)
 
-            config = get_event_config(event_name)
-            warn_config = WARNING_CONFIG.get(warning_min, WARNING_CONFIG[5])
-
-            emoji = config["emoji"]
-            color = config["color"]
-
-            # Mensaje segun tiempo
-            if warning_min == 15:
-                desc = f"**{event_name}** aparecera en **15 minutos**\nPrepara tu equipo!"
-            elif warning_min == 5:
-                desc = f"**{event_name}** en **5 minutos!**\n🎯 Posicionate ya!"
-            else:
-                desc = f"**{event_name}** en **1 minuto!**\n🏃 Corre ya!"
+            cfg = get_event_config(event_name)
+            warn = WARNING_STYLES[warning_min]
 
             embed = discord.Embed(
-                title=f"{warn_config['emoji']} {warn_config['title']} {warn_config['emoji']}",
+                title=f"{warn['seal']}",
                 description=f"""
-{emoji} {emoji} {emoji} {emoji} {emoji}
+{cfg['banner']} **{cfg['rank']}** {cfg['banner']}
 
-{desc}
+> *"{warn['call']}"*
 
-⏰ **Hora exacta:** `{spawn_time.strftime('%H:%M')}`
-📍 **Zona horaria:** Europa/Berlin
+━━━━━━━━━━━━━━━━━━━━━━━
+**{event_name}**
+━━━━━━━━━━━━━━━━━━━━━━━
+
+⏳ **Marcha en:** `{minutes_until} minutos`
+🕐 **Hora del encuentro:** `{spawn_time.strftime('%H:%M')}`
+🌍 **Zona:** Europa/Berlín
+
+{warn['mood']} Urgencia: `{warning_min} minutos restantes`
                 """,
-                color=color
+                color=cfg['color']
             )
 
-            # Barra visual de urgencia
-            if warning_min == 15:
-                embed.add_field(name="Urgencia", value="🟢🟢🟢🟢🟢", inline=False)
-            elif warning_min == 5:
-                embed.add_field(name="Urgencia", value="🟡🟡🟡🟡⚪", inline=False)
-            else:
-                embed.add_field(name="Urgencia", value="🔴🔴🔴🔴🔴", inline=False)
+            embed.set_footer(text="🏯 DinastíaL7 • ¡Por el honor del emperador!")
 
-            embed.set_footer(text="Orion2 Boss Bot • ¡No te lo pierdas!")
-
-            # Mencion @everyone solo en alertas importantes
-            if warn_config["mention"]:
+            if warn['mention']:
                 await channel.send("@everyone", embed=embed)
             else:
                 await channel.send(embed=embed)
 
-            print(f"📢 Aviso: {event_name} - {warning_min}min")
             sent_warnings.add(warning_id)
             cleanup_old_warnings()
 
@@ -198,15 +198,15 @@ def cleanup_old_warnings():
     sent_warnings.difference_update(to_remove)
 
 
-@bot.tree.command(name="bosses", description="Muestra los proximos eventos")
+@bot.tree.command(name="bosses", description="Próximas batallas de la Dinastía")
 async def bosses_command(interaction: discord.Interaction):
     upcoming = get_next_spawn_times()
     now = datetime.now(TIMEZONE)
 
     embed = discord.Embed(
-        title="📋 PROXIMOS EVENTOS",
-        description="Lista completa de eventos ordenados por tiempo",
-        color=0x5865F2
+        title="🏯 ORDEN DE BATALLA 🏯",
+        description="*Los generales han dispuesto las próximas campañas*",
+        color=0x8B0000
     )
 
     shown = set()
@@ -216,15 +216,15 @@ async def bosses_command(interaction: discord.Interaction):
             continue
         shown.add(event_id)
 
-        config = get_event_config(spawn["event"])
+        cfg = get_event_config(spawn["event"])
         time_left = spawn["spawn_time"] - now
         hours = int(time_left.total_seconds() // 3600)
         minutes = int((time_left.total_seconds() % 3600) // 60)
         time_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
 
         embed.add_field(
-            name=f"{config['emoji']} {spawn['event']}",
-            value=f"🕐 `{spawn['spawn_time'].strftime('%H:%M')}` (en {time_str})",
+            name=f"{cfg['banner']} {cfg['rank']} — {spawn['event']}",
+            value=f"🕐 `{spawn['spawn_time'].strftime('%H:%M')}` *(en {time_str})*",
             inline=False
         )
 
@@ -234,8 +234,8 @@ async def bosses_command(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@bot.tree.command(name="agregar_evento", description="Agrega un nuevo evento")
-@discord.app_commands.describe(nombre="Nombre del evento", hora="Hora HH:MM")
+@bot.tree.command(name="agregar_evento", description="Añadir nuevo soldado al ejército")
+@discord.app_commands.describe(nombre="Nombre del guerrero", hora="Hora de aparición HH:MM")
 async def add_event_command(interaction: discord.Interaction, nombre: str, hora: str):
     try:
         datetime.strptime(hora, "%H:%M")
@@ -243,30 +243,38 @@ async def add_event_command(interaction: discord.Interaction, nombre: str, hora:
             EVENT_SCHEDULE[nombre] = []
         if hora not in EVENT_SCHEDULE[nombre]:
             EVENT_SCHEDULE[nombre].append(hora)
-            await interaction.response.send_message(f"✅ **{nombre}** agregado a las `{hora}`", ephemeral=True)
+            await interaction.response.send_message(f"🏯 **{nombre}** se une al ejército a las `{hora}`", ephemeral=True)
         else:
-            await interaction.response.send_message(f"⚠️ Horario ya existe", ephemeral=True)
+            await interaction.response.send_message(f"⚠️ Ese horario ya está en los registros", ephemeral=True)
     except ValueError:
-        await interaction.response.send_message("❌ Formato invalido. Usa `HH:MM`", ephemeral=True)
+        await interaction.response.send_message("❌ Formato inválido. Usa `HH:MM`", ephemeral=True)
 
 
-@bot.tree.command(name="eliminar_evento", description="Elimina un evento")
+@bot.tree.command(name="eliminar_evento", description="Retirar soldado del ejército")
 async def remove_event_command(interaction: discord.Interaction, nombre: str):
     if nombre in EVENT_SCHEDULE:
         del EVENT_SCHEDULE[nombre]
-        await interaction.response.send_message(f"🗑️ **{nombre}** eliminado", ephemeral=True)
+        await interaction.response.send_message(f"🗑️ **{nombre}** ha sido retirado del servicio", ephemeral=True)
     else:
-        await interaction.response.send_message(f"❌ No encontrado", ephemeral=True)
+        await interaction.response.send_message(f"❌ No se encuentra en los registros", ephemeral=True)
 
 
-@bot.tree.command(name="horarios", description="Muestra todos los horarios")
+@bot.tree.command(name="horarios", description="Registros completos del ejército")
 async def schedule_command(interaction: discord.Interaction):
-    embed = discord.Embed(title="📅 HORARIOS COMPLETOS", color=0xAAFF44)
+    embed = discord.Embed(
+        title="📜 ROLLO DE HONOR 📜",
+        description="*Todos los soldados y sus horas de guardia*",
+        color=0xDAA520
+    )
 
     for event_name, times in EVENT_SCHEDULE.items():
-        config = get_event_config(event_name)
-        times_str = ", ".join([f"`{t}`" for t in sorted(times)])
-        embed.add_field(name=f"{config['emoji']} {event_name}", value=times_str, inline=False)
+        cfg = get_event_config(event_name)
+        times_str = "  ".join([f"`{t}`" for t in sorted(times)])
+        embed.add_field(
+            name=f"{cfg['banner']} {cfg['rank']} | {event_name}",
+            value=times_str,
+            inline=False
+        )
 
     await interaction.response.send_message(embed=embed)
 
@@ -274,7 +282,7 @@ async def schedule_command(interaction: discord.Interaction):
 @bot.event
 async def setup_hook():
     await bot.tree.sync()
-    print("🔄 Comandos slash sincronizados")
+    print("🥁 Comandos de la Dinastía sincronizados")
 
 
 if __name__ == "__main__":
