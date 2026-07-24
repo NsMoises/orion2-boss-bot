@@ -248,9 +248,20 @@ async def remove_boss_command(interaction: discord.Interaction, nombre: str):
 @bot.tree.command(name="horarios", description="Muestra todos los horarios configurados")
 async def schedule_command(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="📅 Horarios de Jefes Configurados",
-        color=0xAAFF44
-    )
+    title="⏰ ALERTA DE EVENTO ⏰",
+    description=f"""
+    ━━━━━━━━━━━━━━━━━━━━━━━
+    ⚔️ **{boss_name}**
+    
+    🕐 Aparece en: `{spawn_time.strftime('%H:%M')}`
+    ⏳ Tiempo restante: **{minutes_until} minutos**
+    
+    📍 Prepara tu equipo y únete al grupo
+    ━━━━━━━━━━━━━━━━━━━━━━━
+    """,
+    color=0xFF4444
+)
+embed.set_footer(text="Orion2 Boss Bot • ¡No te lo pierdas!")
 
     for boss, times in EVENT_SCHEDULE.items():
         times_str = ", ".join([f"`{t}`" for t in sorted(times)])
