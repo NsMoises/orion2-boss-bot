@@ -4,6 +4,28 @@ from datetime import datetime, timedelta
 import pytz
 import asyncio
 import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# =========================================================
+# PUERTO FALSO PARA RENDER (evita reinicios)
+# =========================================================
+
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Orion2 Bot is running - DinastiaL7")
+
+    def log_message(self, format, *args):
+        pass
+
+def keep_alive():
+    server = HTTPServer(("0.0.0.0", 10000), DummyHandler)
+    server.serve_forever()
+
+threading.Thread(target=keep_alive, daemon=True).start()
+print("🌐 Puerto de keep-alive iniciado en :10000")
 
 # =========================================================
 # CONFIGURACIÓN
@@ -21,14 +43,11 @@ EVENT_SCHEDULE = {
     # ======= SOLDADOS DE LA DINASTÍA =======
     "General Yonghan Gruta 2": ["22:30", "00:00", "01:30", "03:00", "04:30", "06:00", "07:30", "09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00", "22:30"],
     "Golem Magico Gruta 1": ["22:30", "00:00", "01:30", "03:00", "04:30", "06:00", "07:30", "09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00", "22:30"],
-    "Golem de Piedra": ["10:00", "16:00", "22:00"],
-    "Espectro del Abismo": ["08:00", "15:00", "21:00"],
-    "Rey Orco": ["11:00", "17:00", "23:00"],
+    "Jefes de Maps 90": ["04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00", "00:00"],
 
     # ======= METINES SAGRADOS =======
     "Metin de Gruta 1": ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"],
-    "Metin de Hielo": ["10:00", "16:00", "22:00"],
-    "Metin del Trueno": ["11:00", "17:00", "23:00"],
+    "Metin de Maps 90": ["10:00", "16:00", "22:00"],
 
     # ======= GRANDES GUERRAS =======
     "Bruja de Hielo Gruta 1": ["11:10", "17:10", "20:10", "23:10"],
@@ -43,38 +62,20 @@ WARNING_MINUTES = [10, 5, 1]
 # =========================================================
 
 EVENT_CONFIG = {
-    "General Yonghan Gruta 2": {"rank": "🏯 MARISCAL", "color": 0xC41E3A, "banner": "🐉"},
-    "Golem Magico Gruta 1":    {"rank": "🧙 MAGO", "color": 0x9932CC, "banner": "🔮"},
-    "Golem de Piedra":         {"rank": "🗿 GUARDIÁN", "color": 0x8B7355, "banner": "⛰️"},
-    "Espectro del Abismo":     {"rank": "👻 ESPECTRO", "color": 0x4A0080, "banner": "🌑"},
-    "Rey Orco":                {"rank": "👹 SEÑOR", "color": 0x228B22, "banner": "🪓"},
-    "Metin de Gruta 1":        {"rank": "💎 METIN", "color": 0xFF6347, "banner": "☄️"},
-    "Metin de Hielo":          {"rank": "❄️ METIN", "color": 0x00BFFF, "banner": "🧊"},
-    "Metin del Trueno":        {"rank": "⚡ METIN", "color": 0xFFD700, "banner": "🌩️"},
+    "General Yonghan Gruta 2": {"rank": "🏯 JEFE DE GRUTA 2", "color": 0xC41E3A, "banner": "🏯"},
+    "Golem Magico Gruta 1":    {"rank": "🧙 GOLEM GRUTA 1", "color": 0x9932CC, "banner": "🔮"},
+    "Jefes de Maps 90":        {"rank": "👻 JEFES MAP 90", "color": 0x4A0080, "banner": "🌑"},
+    "Metin de Gruta 1":        {"rank": "💎 METIN GRUTA 1", "color": 0xFF6347, "banner": "☄️"},
+    "Metin de Maps 90":        {"rank": "❄️ METIN MAP 90", "color": 0x00BFFF, "banner": "🧊"},
     "Bruja de Hielo Gruta 1":  {"rank": "🧙 BRUJA", "color": 0x00CED1, "banner": "❄️"},
-    "Rey Wubba Map 90":        {"rank": "👑 REY", "color": 0xFFD700, "banner": "👑"},
+    "Rey Wubba Map 90":        {"rank": "👑 REY WUBBA", "color": 0xFFD700, "banner": "👑"},
     "Azrael Infernal":         {"rank": "😈 AZRAEL", "color": 0x8B0000, "banner": "🔥"},
 }
 
 WARNING_STYLES = {
-    10: {
-        "seal": "◈◈◈",
-        "call": "Los exploradores avistan movimiento en el horizonte...",
-        "mood": "🟢",
-        "mention": False,
-    },
-    5: {
-        "seal": "◈◈◈ ◈◈◈",
-        "call": "¡Los tambores de guerra retumban! ¡A las armas!",
-        "mood": "🟡",
-        "mention": True,
-    },
-    1: {
-        "seal": "◈◈◈ ◈◈◈ ◈◈◈",
-        "call": "¡EL ENEMIGO ESTÁ A LAS PUERTAS! ¡FORMACIÓN!",
-        "mood": "🔴",
-        "mention": True,
-    },
+    10: {"seal": "◈◈◈", "call": "Los exploradores avistan movimiento en el horizonte...", "mood": "🟢", "mention": False},
+    5:  {"seal": "◈◈◈ ◈◈◈", "call": "¡Los tambores de guerra retumban! ¡A las armas!", "mood": "🟡", "mention": True},
+    1:  {"seal": "◈◈◈ ◈◈◈ ◈◈◈", "call": "¡EL ENEMIGO ESTÁ A LAS PUERTAS! ¡FORMACIÓN!", "mood": "🔴", "mention": True},
 }
 
 # =========================================================
@@ -194,10 +195,6 @@ def cleanup_old_warnings():
     sent_warnings.difference_update(to_remove)
 
 
-# =========================================================
-# LIMPIEZA AUTOMÁTICA DIARIA A LAS 00:00
-# =========================================================
-
 @tasks.loop(minutes=1)
 async def daily_cleanup():
     now = datetime.now(TIMEZONE)
@@ -233,10 +230,6 @@ async def daily_cleanup():
 
         await asyncio.sleep(120)
 
-
-# =========================================================
-# COMANDOS SLASH
-# =========================================================
 
 @bot.tree.command(name="bosses", description="Próximas batallas de la Dinastía")
 async def bosses_command(interaction: discord.Interaction):
