@@ -73,9 +73,9 @@ EVENT_CONFIG = {
 }
 
 WARNING_STYLES = {
-    10: {"seal": "◈◈◈", "call": "Los exploradores avistan movimiento en el horizonte...", "mood": "🟢", "mention": False},
-    5:  {"seal": "◈◈◈ ◈◈◈", "call": "¡Los tambores de guerra retumban! ¡A las armas!", "mood": "🟡", "mention": True},
-    1:  {"seal": "◈◈◈ ◈◈◈ ◈◈◈", "call": "¡EL ENEMIGO ESTÁ A LAS PUERTAS! ¡FORMACIÓN!", "mood": "🔴", "mention": True},
+    10: {"seal": "◈◈◈", "call": "AUN TIENES TIEMPO DE IR AL BAÑO CAGA TRANQUILO", "mood": "🟢", "mention": False},
+    5:  {"seal": "◈◈◈ ◈◈◈", "call": "¡ORGANIZATE FALTAN 5 MINUTOS!", "mood": "🟡", "mention": True},
+    1:  {"seal": "◈◈◈ ◈◈◈ ◈◈◈", "call": "¡YA CASI SALE APURATE DEJA LO QUE ESTAS HACIENDO!", "mood": "🔴", "mention": True},
 }
 
 # =========================================================
@@ -168,7 +168,7 @@ async def check_events():
                 color=cfg['color']
             )
 
-            embed.set_footer(text="🏯 DinastíaL7 • ¡Por el honor del emperador!")
+            embed.set_footer(text="🏯 DinastíaLT • ¡APURATE MMGVO SE ACABA EL TIEMPO!")
 
             if warn['mention']:
                 await channel.send("@everyone", embed=embed)
